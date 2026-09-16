@@ -1,0 +1,55 @@
+[
+  {
+    "model": "events.event",
+    "pk": 1,
+    "fields": {
+      "title": "Large Reference Event",
+      "start_at": "2026-10-15T09:00:00+02:00",
+      "end_at": "2026-10-15T17:00:00+02:00",
+      "responsible_person": "Alex Example"
+    }
+  },
+  {
+    "model": "events.event",
+    "pk": 2,
+    "fields": {
+      "title": "Small Control Event",
+      "start_at": "2026-11-10T10:00:00+01:00",
+      "end_at": "2026-11-10T12:00:00+01:00",
+      "responsible_person": "Sam Example"
+    }
+  },
+  {
+    "model": "events.participant",
+    "pk": 1,
+    "fields": {
+      "event": 1,
+      "first_name": "Anna",
+      "last_name": "Anderson",
+      "gender": "F",
+      "birth_date": "1995-03-15"
+    }
+  },
+  {
+    "model": "events.participant",
+    "pk": 2,
+    "fields": {
+      "event": 1,
+      "first_name": "Ben",
+      "last_name": "Baker",
+      "gender": "M",
+      "birth_date": "1992-07-22"
+    }
+  },
+  {
+    "model": "events.participant",
+    "pk": 3,
+    "fields": {
+      "event": 2,
+      "first_name": "Casey",
+      "last_name": "Clark",
+      "gender": "D",
+      "birth_date": "2001-11-03"
+    }
+  }
+]
