@@ -13,3 +13,4 @@ htmlcov/
 output/
 generated/
 *.pdf
+/events/document_templates/~$*
