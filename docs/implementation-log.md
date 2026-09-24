@@ -37,3 +37,14 @@
 - Affected files:
   - events/document_templates/participant_list.docx
   - docs/implementation-log.md
+
+## 2026-09-24: Resolve font change during PDF conversion
+
+- Goal: Check whether the rendered DOCX retains its typography after PDF conversion.
+- Implementation: Generated a PDF through the locally operated Gotenberg service. Changed the main Word template font from Aptos to Arial and generated the PDF again.
+- Observation: Text formatted with Aptos in Word appeared in a different font in the first PDF, visually resembling Times New Roman. After changing the template to Arial, the PDF appearance matched the expected layout more closely.
+- Effort evidence: One DOCX template revision and two visual PDF checks. No implementation time was recorded.
+- Possible cause: The converter may not have had Aptos available. The installed fonts and embedded PDF fonts have not yet been checked.
+- Resolution: Arial is used as a practical template choice for this prototype. Installing additional fonts in the Gotenberg image is outside the current implementation scope.
+- Open point: The actual font embedded or substituted in the PDF has not been identified.
+- Affected files: events/document_templates/participant_list.docx, contact_legal_block.docx

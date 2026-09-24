@@ -56,3 +56,25 @@ The requirement is fulfilled in the rendered DOCX document.
 The behavior depends on the correct configuration of Word paragraph settings. It must
 therefore be checked visually for every relevant template revision and again after PDF
 conversion.
+
+## PDF conversion
+
+### Objective observation
+
+The DOCX template rendered successfully and the PDF was generated through the locally
+operated Gotenberg service. Text set in Aptos in Microsoft Word 365 appeared with
+visibly different typography in the PDF. Changing the template font to Arial improved
+the visual agreement with the Word document.
+
+### Interpretation
+
+The conversion result depends not only on docxtpl and the Word template but also on the
+font environment of the LibreOffice-based conversion service. A missing font is a
+plausible cause of the observed substitution, but the specific cause has not been
+verified.
+
+### Assessment
+
+PDF generation is functional for the tested documents. Typography and potentially
+pagination remain environment-dependent. For this prototype, the template uses Arial
+instead of extending the Gotenberg image with additional fonts.
