@@ -57,3 +57,12 @@
 - Effort evidence: One new Python module, one service change, and a revised DOCX template. No implementation time was recorded.
 - Limitation: Reuse of an existing custom Django `templatetags` module has not yet been tested.
 - Affected files: events/document_filters.py, events/services.py, events/document_templates/participant_list.docx
+
+## 2026-09-24: Verify content in converted PDFs
+
+- Goal: Check whether expected content remains available after DOCX-to-PDF conversion.
+- Implementation: Generated PDFs for the reference events with Gotenberg and checked extracted PDF text.
+- Observation: The tested participant content was present. The notice appeared for the event with 60 participants and was absent for the event with 25 participants.
+- Effort evidence: Automated PDF text checks for two fixture events; no implementation time recorded.
+- Limitation: Text extraction does not verify visual layout, fonts or page breaks.
+- Affected files: events/test_document_generation.py, docs/implementation-log.md
