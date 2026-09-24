@@ -12,3 +12,4 @@ htmlcov/
 .mypy_cache/
 output/
 generated/
+/events/document_templates/~$*
