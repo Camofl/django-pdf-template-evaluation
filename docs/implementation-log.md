@@ -10,3 +10,30 @@
 - Issues encountered: None documented so far.
 - Open points: Configure different header logos, include the company address from a reusable document component, and verify DOCX rendering.
 - Affected files: events/document_templates/participant_list.docx
+
+## 2026-09-24: Correct pagination settings in the DOCX template
+
+- Goal: Verify and correct pagination behavior for the dynamic participant table and the multi-line notice block.
+- Implementation:
+  - Reviewed the table-row properties in Microsoft Word 365.
+  - Disabled the repeated-header-row setting for the dynamic participant data row.
+  - Kept the repeated-header-row setting enabled only for the static column-header row.
+  - Enabled the paragraph setting that keeps lines of the visible notice block together on one page.
+  - Excluded the docxtpl control paragraphs containing `{%p ... %}` from the pagination setting.
+- Observation:
+  - The dynamic participant row was initially configured as a repeated table header. After rendering, this caused the generated participant table to move to the next page unexpectedly.
+  - The visible multi-line notice block could initially be split across two pages.
+  - After correcting the Word settings, the participant table and the notice block showed the intended pagination behavior.
+- Effort evidence:
+  - One DOCX template was revised.
+  - Two Word pagination settings were identified and corrected.
+  - The corrections required manual rendering and visual verification.
+- Issues encountered:
+  - Repeated-header-row formatting was inherited by the template row that docxtpl duplicates for each participant.
+  - Paragraph pagination settings must not be applied to docxtpl control paragraphs.
+- Resolution or open point:
+  - The template behavior was corrected in Microsoft Word 365.
+  - The behavior still needs to be verified again after DOCX-to-PDF conversion.
+- Affected files:
+  - events/document_templates/participant_list.docx
+  - docs/implementation-log.md

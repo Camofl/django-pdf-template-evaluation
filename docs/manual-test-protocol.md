@@ -1,0 +1,11 @@
+# Manual Test Protocol: docxtpl
+
+| Date       | Test document         | Test criterion                                                                    | Result | Observation                                                                                  |
+|------------|-----------------------|-----------------------------------------------------------------------------------|--------|----------------------------------------------------------------------------------------------|
+| 2026-09-24 | Large Reference Event | The table column-header row repeats on subsequent pages.                          | Passed | The static column-header row was repeated correctly.                                         |
+| 2026-09-24 | Large Reference Event | The participant table starts at the expected position and continues across pages. | Passed | The table no longer moved unexpectedly to the next page after the row setting was corrected. |
+| 2026-09-24 | Large Reference Event | The conditional notice is displayed and not split across two pages.               | Passed | The visible notice paragraph used the Word pagination setting for keeping lines together.    |
+| 2026-09-24 | Small Control Event   | The conditional notice is not displayed.                                          | Passed | The if condition works as intended.                                                          |
+| 2026-09-24 | Large Reference Event | The large first-page logo and small subsequent-page logo are displayed correctly. | Passed | Verified in the rendered DOCX document.                                                      |
+| 2026-09-24 | Large Reference Event | Page numbers are visible in the footer on every page.                             | Passed | Verified in the rendered DOCX document.                                                      |
+| 2026-09-24 | Large Reference Event | The company and legal block appears in the footer.                                | Passed | Verified in the rendered DOCX document.                                                      |
