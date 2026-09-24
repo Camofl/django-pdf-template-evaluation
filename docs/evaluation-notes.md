@@ -78,3 +78,36 @@ verified.
 PDF generation is functional for the tested documents. Typography and potentially
 pagination remain environment-dependent. For this prototype, the template uses Arial
 instead of extending the Gotenberg image with additional fonts.
+
+## Template filters
+
+### Objective observation
+
+The docxtpl prototype uses a custom Jinja environment. Two filters were registered in
+this environment: `initials` as a newly implemented filter and `django_date` as an
+adapter around Django's built-in date filter. The environment is passed to the rendering
+call in `events/services.py`.
+
+Filter arguments in the DOCX template use Jinja syntax, for example
+`{{ event.start_at|django_date("D d M Y") }}`. Django template syntax such as
+`{{ event.start_at|date:"D d M Y" }}` is not directly compatible.
+
+### Interpretation
+
+Custom presentation logic can be added to the Word template without preformatting every
+value in the document context. Existing Python functions used by Django template filters
+may also be reusable if they are explicitly registered with Jinja and their behavior is
+compatible.
+
+### Limitation
+
+The prototype has not yet demonstrated direct reuse of an existing custom `templatetags`
+module. Automatic registration through Django's `{% load %}` mechanism does not apply to
+the Jinja-based DOCX template. The effort needed to adapt existing filters depends on
+the individual filter.
+
+### Assessment
+
+Custom filter support is a positive result for docxtpl. Reuse of existing Django filter
+implementations remains a plausible option, not a generally verified capability of this
+prototype.

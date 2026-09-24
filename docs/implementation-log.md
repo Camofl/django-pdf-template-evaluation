@@ -48,3 +48,12 @@
 - Resolution: Arial is used as a practical template choice for this prototype. Installing additional fonts in the Gotenberg image is outside the current implementation scope.
 - Open point: The actual font embedded or substituted in the PDF has not been identified.
 - Affected files: events/document_templates/participant_list.docx, contact_legal_block.docx
+
+## 2026-09-24: Explore template filters
+
+- Goal: Determine whether formatting and custom presentation logic can be used inside the DOCX template.
+- Implementation: Added a Jinja environment with a custom `initials` filter and a `django_date` adapter for Django's built-in date filter. Passed the environment to the docxtpl rendering call.
+- Observation: The prototype can register filters for use in the Word template and they actually work.
+- Effort evidence: One new Python module, one service change, and a revised DOCX template. No implementation time was recorded.
+- Limitation: Reuse of an existing custom Django `templatetags` module has not yet been tested.
+- Affected files: events/document_filters.py, events/services.py, events/document_templates/participant_list.docx
