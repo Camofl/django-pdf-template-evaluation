@@ -1,0 +1,6 @@
+services:
+  carbone:
+    image: carbone/carbone-ee:full-5.14.5
+    ports:
+      - "127.0.0.1:4000:4000"
+    restart: unless-stopped
