@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 
+from .document_filters import build_document_environment
 from .models import Event
 import logging
 import tempfile
@@ -91,8 +92,11 @@ def generate_participant_list(event: Event) -> GeneratedDocument:
             context["contact_legal_block"] = main_template.new_subdoc(
                 str(rendered_company_path)
             )
-            main_template.render(context, autoescape=True)
-
+            main_template.render(
+                context,
+                jinja_env=build_document_environment(),
+                autoescape=True,
+            )
             docx_buffer = BytesIO()
             main_template.save(docx_buffer)
             docx_buffer.seek(0)
