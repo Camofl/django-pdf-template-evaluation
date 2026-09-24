@@ -1,101 +1,64 @@
 # Django PDF Template Evaluation
 
-## Purpose
-
-This project provides a research prototype for evaluating different approaches
-to PDF generation in a Django application.
-
-The prototype compares the following approaches:
-
-- Carbone
-- docx-mailmerge2
-- docxtpl
-
-The project uses an event and participant domain model. A participant list can
-be generated from the Django admin change view of an event.
+This branch implements the Carbone Community prototype for the event participant list. The common domain model and fixture data originate from `main`. The other candidates remain isolated on `prototype/docxtpl` and `prototype/docx-mailmerge2`. This repository is a research prototype, not a production deployment.
 
 ## Scope
 
-The `main` branch contains only the shared Django application structure:
+- Render a Word template with event data and a dynamic participant table.
+- Generate PDFs for the 60-participant reference event and the 25-participant control event.
+- Trigger downloads from the Django admin event change view.
+- Use a locally operated Carbone container without a license key or Carbone Cloud.
+- Evaluate conditional content, multi-page layout and built-in formatters.
+- Record the missing inclusion of a separately editable company and legal document.
 
-- Event and participant domain model
-- Django admin integration
-- Shared document generation service contract
-- Test fixture data
-- Automated tests
-- Documentation structure
+## Requirements
 
-The `main` branch does not contain a PDF generation engine.
+- Python compatible with the pinned Django version in `requirements.txt`.
+- pip and Docker with Docker Compose.
+- A local port 4000 that is available for the Carbone service.
 
-The individual approaches are implemented on separate branches:
-
-- `prototype/carbone`
-- `prototype/docx-mailmerge2`
-- `prototype/docxtpl`
-
-## Prerequisites
-
-- Python 3.12 or newer
-- pip
-- Git
-
-## Setup
-
-Create and activate a virtual environment:
+## Local setup
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Apply migrations:
-
-```bash
+python -m pip install -r requirements.txt
 python manage.py migrate
-```
-
-Load fixture data:
-
-```bash
 python manage.py loaddata events
-```
-
-Create an admin user:
-
-```bash
 python manage.py createsuperuser
-```
-
-Start the development server:
-
-```bash
+docker compose up -d
+curl --fail-with-body http://127.0.0.1:4000/status
 python manage.py runserver
 ```
 
-Open the Django admin interface:
+Open the Django admin at `http://127.0.0.1:8000/admin/`, select an event and use the participant list PDF link in its change view. The local converter address defaults to `http://127.0.0.1:4000` and can be overridden with `CARBONE_URL`. The Docker port is bound to localhost in `compose.yaml`. Do not expose the conversion service to the public internet when processing customer documents.
 
-```text
-http://127.0.0.1:8000/admin/
+## Preview and tests
+
+Generate local DOCX and PDF previews for both fixture events:
+
+```bash
+python -m events.preview_carbone
 ```
 
-## Tests
-
-Run all automated tests:
+The preview files are written under `generated/carbone/` and are ignored by Git. Use only non-sensitive fixture data for this prototype. Run the regular test suite without an external service:
 
 ```bash
 python manage.py test
 ```
 
-## Document Generation
+The Carbone integration test requires the running local service:
 
-The `main` branch defines a shared service interface in `events/services.py`.
+```bash
+RUN_CARBONE_TESTS=1 python manage.py test
+```
 
-The document generation function intentionally raises `NotImplementedError` on
-the `main` branch. A concrete implementation is added only in the respective
-prototype branch.
+Without `RUN_CARBONE_TESTS=1`, the live test is skipped. The mocked tests check data transfer and response headers; only the live test checks the resulting PDFs. Visual checks remain necessary for logos, footer page numbers, table headers and page breaks.
+
+## Architecture and limitations
+
+`events/services.py` builds data from the shared models, formats event datetimes for JSON, loads the versioned DOCX template and posts it to the local Carbone `/render/template` endpoint. The service validates the PDF response and returns it through the existing Django admin route. The full Docker image includes its own LibreOffice conversion environment, so this branch does not depend on Gotenberg.
+
+This branch does not implement inclusion of a second editable DOCX for the company and legal block. The block is therefore absent from the generated document. No paid Carbone feature or Python-side copy-and-paste substitute is counted as fulfillment. The tested conditional content, participant table and built-in formatters remain editable in the Word template.
+
+See `docs/implementation-log.md`, `docs/evaluation-notes.md`, `docs/manual-test-protocol.md` and `docs/sources.md` for observations and source records. Exact development times and benchmark measurements were not recorded.
