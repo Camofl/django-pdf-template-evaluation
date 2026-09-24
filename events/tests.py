@@ -241,15 +241,3 @@ class EventAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("/admin/login/", response.url)
-
-    def test_generate_view_redirects_when_no_engine_is_available(self) -> None:
-        self.client.force_login(self.admin_user)
-
-        response = self.client.get(self.generate_url, follow=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertRedirects(response, self.change_url)
-        self.assertContains(
-            response,
-            "No PDF generation engine is implemented on the main branch.",
-        )

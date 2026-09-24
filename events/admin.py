@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.contrib import admin, messages
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -43,7 +45,7 @@ class EventAdmin(admin.ModelAdmin):
             self,
             request: HttpRequest,
             event_id: int,
-    ) -> HttpResponse:
+    ) -> FileResponse:
         event = get_object_or_404(
             Event.objects.prefetch_related("participants"),
             pk=event_id,
@@ -74,13 +76,15 @@ class EventAdmin(admin.ModelAdmin):
                 )
             )
 
-        response = FileResponse(
-            document.content,
+        pdf_buffer = BytesIO(document.content)
+        pdf_buffer.seek(0)
+
+        return FileResponse(
+            pdf_buffer,
             content_type=document.content_type,
             as_attachment=True,
             filename=document.filename,
         )
-        return response
 
 
 @admin.register(Participant)
