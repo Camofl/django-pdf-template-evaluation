@@ -1,81 +1,48 @@
 # Implementierungsprotokoll: docx-mailmerge2
 
-Dieses Protokoll beschreibt ausschließlich die bislang berichteten lokalen
-Arbeitsschritte. Der Branch `prototype/docx-mailmerge2` basiert auf dem gemeinsamen
-Stand von `main`. Die prototypspezifischen Änderungen waren zum Zeitpunkt dieses
-Eintrags noch nicht auf GitHub veröffentlicht. Eine exakte Arbeitszeit wurde nicht
-erhoben.
+Stand: 24. September 2026. Das Protokoll hält berichtete und im Repository nachvollziehbare Arbeitsschritte fest. Exakte Arbeitszeiten wurden nicht erhoben. Aussagen zum Aufwand beziehen sich auf Dateien, Word-Felder, Dienste und aufgetretene Probleme.
 
-## 2026-09-24: Word-Vorlage mit MergeFields erstellen
+## 2026-09-24: Word-Vorlage und Teilnehmerzeile
 
-- Ziel: Eine in Microsoft Word 365 bearbeitbare Teilnehmerliste mit echten
-  Word-MergeFields erstellen.
-- Umsetzung: Veranstaltungsfelder und die vier Felder einer Teilnehmer-Datenzeile in
-  einer neuen DOCX-Vorlage angelegt.
-- Beobachtung: `get_merge_fields()` erkannte die neun Felder `event_end_at`, `event_id`,
-  `event_responsible_person`, `event_start_at`, `event_title`, `participant_age`,
-  `participant_first_name`, `participant_gender` und `participant_last_name`.
-- Aufwandsnachweis: Eine DOCX-Vorlage und neun Word-Felder. Keine verlässliche
-  Zeitmessung vorhanden.
-- Problem: Echte Word-Feldfunktionen mussten erstellt werden. Reiner Platzhaltertext
-  hätte für den Versuch nicht genügt.
-- Lösung oder offener Punkt: Die Feldstruktur wurde erkannt. Bearbeitbarkeit und
-  Fehlerrisiko bei umfangreicheren Vorlagen bleiben Gegenstand der Bewertung.
-- Betroffene Dateien: `events/document_templates/participant_list.docx`.
+- Ziel: Dieselbe Teilnehmerliste wie im gemeinsamen Referenzfall mit echten Word-MergeFields erzeugen.
+- Umsetzung: In Word 365 eine DOCX-Vorlage mit Veranstaltungsfeldern und vier Feldern in einer Teilnehmerzeile erstellt. Das Preview-Skript verwendet `merge_rows()` sowie `merge()` für die Daten der gemeinsamen Fixture.
+- Beobachtung: `get_merge_fields()` erkannte neun Veranstaltungs- und Teilnehmerfelder. Die einfache DOCX-Erzeugung funktionierte.
+- Aufwandsnachweis: Eine Word-Vorlage und ein Preview-Skript. Keine Zeitmessung.
+- Problem und Ergebnis: Echte Word-Felder erfordern eine andere Bearbeitung als gewöhnlicher Platzhaltertext.
+- Betroffene Dateien: `events/document_templates/participant_list.docx`, `events/preview_mailmerge.py`, `requirements.txt`.
 
-## 2026-09-24: Dynamische Teilnehmerzeile erproben
+## 2026-09-24: Bedingten Hinweis und Zeichenformatierung erproben
 
-- Ziel: Veranstaltungsdaten und Teilnehmer aus der gemeinsamen Fixture in eine
-  DOCX-Datei einsetzen.
-- Umsetzung: Der lokale Preview-Versuch verwendete die bestehende fachliche Datenbasis
-  und `merge_rows()` für die Teilnehmerzeile.
-- Beobachtung: Die einfache DOCX-Erzeugung funktionierte nach eigener Prüfung. Eine
-  vollständige automatisierte Prüfung aller Teilnehmerzeilen wurde bislang nicht
-  berichtet.
-- Aufwandsnachweis: Eine Preview-Implementierung und die bestehende DOCX-Vorlage. Keine
-  verlässliche Zeitmessung vorhanden.
-- Problem: Bislang keines für diesen einfachen Versuchsfall berichtet.
-- Lösung oder offener Punkt: Umfangreiche Inhalts- und Layouttests sowie die
-  PDF-Konvertierung stehen noch aus.
-- Betroffene Dateien: Lokales Preview-Skript und
-  `events/document_templates/participant_list.docx`. Den tatsächlichen Pfad des
-  Preview-Skripts vor dem Commit prüfen.
-
-## 2026-09-24: Bedingten Hinweis mit Word-IF-Feldern prüfen
-
-- Ziel: Einen Hinweis bei mehr als 25 Teilnehmern vollständig über eine vom Kunden
-  bearbeitbare Word-Vorlage steuern.
-- Umsetzung: Ein Word-IF-Feld mit verschachteltem MergeField für die Bedingung erstellt.
-  Anschließend mehrere IF-Felder für unterschiedlich formatierte Absätze ausprobiert.
-- Beobachtung: Die bedingte Ausgabe funktionierte im lokalen Versuch. Unterschiedliche
-  Absatzformatierungen waren mit getrennten IF-Feldern möglich. Innerhalb eines
-  einzelnen Feldresultats gingen die gezielt rot und kursiv formatierten Textstellen im
-  erzeugten Dokument verloren. Die exakte Ursache wurde nicht isoliert untersucht.
-- Aufwandsnachweis: Mehrere manuell erstellte Word-Feldfunktionen und visuelle Prüfung
-  des Ausgabedokuments. Keine verlässliche Zeitmessung vorhanden.
-- Problem: Größere Textblöcke sind als zitierte IF-Feldresultate schwer zu bearbeiten.
-  Unterschiedliche Zeichenformatierungen innerhalb eines Feldresultats blieben nicht
-  erhalten.
-- Lösung oder offener Punkt: Getrennte IF-Felder ermöglichen unterschiedliche
-  Absatzformatierungen, ersetzen jedoch keinen frei formatierbaren bedingten Block. Ein
-  Python-seitig eingesetzter Hinweistext wird nicht als gleichwertige,
-  kundenbearbeitbare Lösung gewertet.
-- Betroffene Dateien: `events/document_templates/participant_list.docx`.
+- Ziel: Einen vom Kunden in Word bearbeitbaren Hinweis bei mehr als 25 Teilnehmern darstellen.
+- Umsetzung: Word-IF-Felder mit verschachteltem MergeField und die Option `merge_if_fields=True` eingesetzt. Mehrere IF-Felder mit unterschiedlichen Absatzformatierungen sowie ein Feld mit roten und kursiven Textteilen geprüft.
+- Beobachtung: Die Bedingung funktionierte. Verschiedene IF-Felder erlaubten unterschiedliche Absatzformatierungen. Innerhalb eines einzelnen Feldresultats gingen die roten und kursiven Textteile im erzeugten Ergebnis verloren.
+- Aufwandsnachweis: Manuelle Feldbearbeitung in Word und visuelle Prüfung. Keine Zeitmessung.
+- Problem und Ergebnis: Größere IF-Feldresultate sind schwer zu bearbeiten. Ein Python-seitig eingesetzter vollständiger Hinweistext wird nicht als gleichwertige, kundenbearbeitbare Lösung betrachtet.
+- Betroffene Datei: `events/document_templates/participant_list.docx`.
 
 ## 2026-09-24: Separaten Kontakt- und Rechtsblock untersuchen
 
-- Ziel: Einen separat bearbeitbaren Word-Baustein für Kontakt- und Rechtsangaben ohne
-  manuelle Aktualisierung in das Ergebnis übernehmen.
-- Umsetzung: Die Word-Feldfunktion `INCLUDETEXT` als möglichen Inklusionsansatz erprobt.
-- Beobachtung: Die Einbindung konnte im lokalen Versuch nicht erfolgreich umgesetzt
-  werden. Es liegt kein Nachweis vor, dass eine Änderung an einer zweiten DOCX-Datei
-  automatisch in der erzeugten DOCX und PDF erscheint.
-- Aufwandsnachweis: Ein erprobter Word-Feldansatz. Keine verlässliche Zeitmessung
-  vorhanden.
-- Problem: Die Erstellung und Verwaltung der externen Referenz erschien unhandlich. Ein
-  konkreter technischer Fehlergrund wurde nicht ermittelt.
-- Lösung oder offener Punkt: Die echte Inklusion eines zweiten Word-Dokuments bleibt
-  unerfüllt. Direkt in der Hauptvorlage platzierte Kontaktfelder wären lediglich ein
-  funktionaler Ersatz, keine gleichwertige Inklusion.
-- Betroffene Dateien: Lokale Word-Vorlage und gegebenenfalls eine lokale Testdatei für
-  den Kontaktblock. Nur tatsächlich vorhandene Dateien im Commit angeben.
+- Ziel: Einen separat bearbeitbaren Word-Baustein automatisch einbinden.
+- Umsetzung: Die Word-Feldfunktion `INCLUDETEXT` erprobt.
+- Beobachtung: Die Einbindung gelang im lokalen Versuch nicht. Der konkrete technische Fehlergrund wurde nicht isoliert.
+- Aufwandsnachweis: Ein gesonderter Feldversuch. Keine Zeitmessung.
+- Ergebnis: Der Kontakt- und Rechtsblock wurde aus der aktuellen Hauptvorlage entfernt. Die Fußzeile enthält nur die Seitenangabe. Einzelne Firmendaten-Felder wurden bewusst nicht als Ersatz für echte Vorlagen-Inklusion implementiert.
+- Betroffene Datei: `events/document_templates/participant_list.docx`.
+
+## 2026-09-24: PDF-Konvertierung und Admin-Download integrieren
+
+- Ziel: Die von docx-mailmerge2 erzeugte DOCX über denselben lokal betriebenen Gotenberg-Dienst wie im docxtpl-Versuch in eine PDF umwandeln.
+- Umsetzung: Gotenberg zunächst isoliert mit der Preview-DOCX geprüft. Danach die Merge-Logik in `events/services.py` integriert und die vorhandene Admin-Download-Aktion an die PDF-Antwort angeschlossen.
+- Beobachtung: Die isolierte Konvertierung und der PDF-Download aus dem Django-Admin funktionierten im lokalen Versuch. Die erzeugten PDFs zeigten nach Sichtprüfung keine wahrnehmbare Abweichung von den zugehörigen generierten DOCX-Dateien.
+- Aufwandsnachweis: Ein Compose-Dienst, Änderungen an Settings, Service, Admin und Abhängigkeiten. Keine Zeitmessung.
+- Einschränkung: Die Sichtprüfung ersetzt keine pixelgenaue Layoutanalyse. Der Kontakt- und Rechtsblock bleibt unerfüllt.
+- Betroffene Dateien: `compose.yaml`, `config/settings.py`, `events/services.py`, `events/admin.py`, `requirements.txt`.
+
+## 2026-09-24: DOCX und PDF automatisiert prüfen
+
+- Ziel: Inhalt und Ausgabeformat bei beiden Referenzveranstaltungen nachweisen.
+- Umsetzung: Der DOCX-Test prüft Veranstaltungstitel und Teilnehmernachnamen vor der Konvertierung. Ein gemockter Admin-Test prüft PDF-Header und Download. Der gesondert aktivierte Live-Test ruft Gotenberg auf, liest die PDFs mit pypdf und prüft die Teilnehmernamen, Mehrseitigkeit sowie Erscheinen und Fehlen des Hinweises bei 60 beziehungsweise 25 Teilnehmern.
+- Beobachtung: Laut lokalem Testlauf bestanden auch die Tests mit aktiviertem Gotenberg. Der Live-Test ist im normalen Testlauf ohne `RUN_GOTENBERG_TESTS=1` übersprungen.
+- Aufwandsnachweis: Eine zusätzliche Testdatei und zwei Testabhängigkeiten. Keine Zeitmessung.
+- Einschränkung: Textextraktion prüft weder Schriftgestaltung noch Logo-Größe oder die exakte Lage von Seitenumbrüchen.
+- Betroffene Dateien: `events/test_document_generation.py`, `requirements.txt`.

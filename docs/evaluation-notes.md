@@ -1,130 +1,73 @@
 # Evaluation: docx-mailmerge2
 
-Stand: 2026-09-24. Diese Bewertung bezieht sich auf die bislang berichteten lokalen
-Versuche. Sie ist kein abschließender Vergleich mit docxtpl oder Carbone. Die
-tatsächliche DOCX-Vorlage und die lokale Preview-Implementierung wurden bislang nicht
-anhand eines gepushten Commits geprüft.
+Stand: 24. September 2026. Die Beobachtungen beziehen sich auf die gemeinsame Veranstaltungs-Fixture mit 60 und 25 Teilnehmern sowie die bisherige Word-Vorlage. Aussagen über Ursachen und Eignung sind als Interpretation gekennzeichnet.
 
 ## Implementierungsaufwand
 
-**Beobachtung:** Eine Vorlage mit neun echten Word-MergeFields wurde erstellt. Alle neun
-Feldnamen konnten mit `get_merge_fields()` erkannt werden. Eine einfache Erzeugung mit
-dynamischer Teilnehmerzeile funktionierte im lokalen Versuch.
+**Beobachtung:** Neun echte MergeFields wurden in Word 365 erkannt. Die dynamische Teilnehmerzeile ließ sich mit `merge_rows()` füllen. Für IF-Felder und den Versuch einer Teilvorlage waren weitere Word-Feldfunktionen erforderlich. Exakte Arbeitszeiten liegen nicht vor.
 
-**Einordnung:** Die anfängliche Datenübergabe ist überschaubar. Der Aufwand für das
-manuelle Anlegen und Pflegen von Word-Feldfunktionen muss getrennt vom Python-Code
-bewertet werden. Die Beobachtung des Nutzers deutet auf höheren Pflegeaufwand bei
-komplexeren bedingten Blöcken hin. Es liegen keine erhobenen Implementierungszeiten vor.
+**Einordnung:** Die einfache Datenersetzung war überschaubar. Der Aufwand für die manuelle Gestaltung komplexer Feldfunktionen wird durch reine Python-Codezeilen nicht angemessen abgebildet.
 
 ## Fehleranfälligkeit
 
-**Beobachtung:** Mehrere IF-Felder ermöglichten unterschiedliche Absatzformatierungen.
-Eine innerhalb eines IF-Feldresultats rot und kursiv gestaltete Passage erschien im
-erzeugten Ergebnis dagegen ohne diese unterschiedlichen Zeichenformatierungen.
+**Beobachtung:** Bedingte Ausgabe und unterschiedliche Absatzformatierungen über mehrere IF-Felder funktionierten. Rote und kursive Passagen innerhalb eines einzelnen Feldresultats verloren ihre differenzierte Formatierung.
 
-**Einordnung:** Eine erfolgreiche Bedingungsprüfung allein belegt keine ausreichende
-Formatierungstreue. Die Ursache wurde nicht weiter isoliert. Der Effekt wird als
-beobachtete Einschränkung des getesteten Gesamtverfahrens dokumentiert, nicht als
-allgemeine Aussage über sämtliche Word-Feldkonfigurationen.
+**Einordnung:** Die Bedingung selbst ist nicht mit der Gestaltungstreue eines komplexen Textblocks gleichzusetzen. Die technische Ursache des Formatverlusts wurde nicht isoliert.
 
 ## Praktische Stabilität
 
-**Beobachtung:** Die einfache DOCX-Erzeugung funktionierte. Wiederholte Durchläufe,
-Fehlerfälle und automatisierte PDF-Tests wurden für diesen Kandidaten noch nicht
-dokumentiert.
+**Beobachtung:** Der lokale Admin-Download funktionierte. Gemockte Tests prüfen die Übergabe und Antwort. Ein explizit aktivierter Live-Test mit Gotenberg lief nach Angabe des Entwicklers erfolgreich. Wiederholte Belastungs- und Fehlerszenarien sowie drei dokumentierte Laufzeitmessungen liegen nicht vor.
 
-**Einordnung:** Zur Stabilität des vollständigen Download-Ablaufs ist noch keine
-belastbare Aussage möglich.
+**Einordnung:** Aussagen über allgemeine Zuverlässigkeit oder Performanz wären derzeit nicht belegt.
 
 ## Integration in Django
 
-**Beobachtung:** Die bestehende Veranstaltungs- und Teilnehmerdatenbasis wurde für den
-lokalen Preview-Versuch genutzt. Eine Anbindung der Dokumenterzeugung an den
-Admin-Download ist für diesen Branch noch nicht nachgewiesen.
+**Beobachtung:** `events/services.py` erzeugt eine DOCX aus dem gemeinsamen Kontext, übermittelt sie per HTTP an Gotenberg und gibt PDF-Bytes zurück. Die bestehende Admin-Änderungsansicht bietet den Download an.
 
-**Einordnung:** Die Integration kann erst nach Implementierung und Test der
-Service-Schnittstelle bewertet werden.
+**Einordnung:** Die Integration in den vorgesehenen Nutzungspfad ist gelungen. Der zusätzliche Konvertierungsdienst bleibt eine betriebliche Abhängigkeit.
 
 ## Bearbeitbarkeit der Vorlage
 
-**Beobachtung:** Feste Felder und die Teilnehmerzeile konnten in Word 365 erstellt
-werden. Größere IF-Feldresultate mussten als Feldinhalt gepflegt werden.
-Unterschiedliche Zeichenformatierungen innerhalb eines Feldresultats gingen im
-getesteten Ergebnis verloren.
+**Beobachtung:** MergeFields und die Teilnehmerzeile sind in Word 365 bearbeitbar. Größere bedingte Inhalte müssen in Feldresultaten gepflegt werden. Unterschiedlich formatierte Textteile innerhalb eines getesteten IF-Feldresultats blieben nicht erhalten.
 
-**Einordnung:** Die Vorlage ist grundsätzlich in Word bearbeitbar. Bei komplexem,
-bedingtem Inhalt ist die Bearbeitung aber weniger unmittelbar als bei normalem
-Word-Text. Ein aus Python eingesetzter vollständiger Hinweistext würde das Kriterium
-kundenbearbeitbarer Vorlagen nicht gleichwertig erfüllen.
+**Einordnung:** Die einfache Vorlage ist gut zugänglich. Für komplexe, kundenbearbeitbare Textblöcke ist der getestete Ansatz weniger geeignet als die einfache Felderkennung vermuten lässt. Ein Python-seitig eingefügter Textblock wäre für dieses Kriterium nicht gleichwertig.
 
 ## Dynamische Tabelle und Seitenumbrüche
 
-**Beobachtung:** Die einfache Teilnehmerliste wurde lokal mit einer dynamischen
-Tabellenzeile erstellt. Eine dokumentierte Prüfung sämtlicher Datenzeilen, des
-wiederholten Tabellenkopfs und der Seitenumbrüche liegt für diesen Kandidaten noch nicht
-vor.
+**Beobachtung:** Der DOCX-Test prüft alle Teilnehmernachnamen der großen Veranstaltung. Der Live-Test prüft die Namen in beiden PDFs und mehr als eine Seite für die große Veranstaltung. Nach Sichtprüfung entsprachen die PDFs den generierten DOCX-Dateien.
 
-**Einordnung:** Eine positive Bewertung mehrseitiger Tabellen wäre derzeit verfrüht.
+**Einordnung:** Dynamische, mehrseitige Ausgabe ist für die Testdaten nachgewiesen. Die genaue Tabellenkopf-Wiederholung und konkrete Seitenübergänge sind durch Textextraktion allein nicht bewiesen.
 
 ## Bedingte Logik
 
-**Beobachtung:** Die Word-IF-Bedingung funktionierte im lokalen Versuch. Getrennte
-IF-Felder erlaubten verschiedene Absatzformatierungen. Die differenzierte Formatierung
-innerhalb eines IF-Feldresultats wurde nicht erhalten.
+**Beobachtung:** Word-IF-Felder mit `merge_if_fields=True` funktionierten. Der PDF-Live-Test prüft, dass der Warntext bei 60 Teilnehmern erscheint und bei 25 Teilnehmern fehlt. Die unterschiedlich formatierten Zeichen innerhalb eines IF-Feldresultats wurden nicht erhalten.
 
-**Einordnung:** Bedingte Textausgabe ist nachgewiesen. Ein frei formatierbarer,
-mehrabsätziger Block mit durchgehend erhaltener Gestaltung ist bislang nicht
-nachgewiesen. Der experimentelle Status der IF-Verarbeitung in der
-Bibliotheksdokumentation sollte bei der Interpretation berücksichtigt werden. Kurzbeleg:
-Projekt docx-mailmerge2, o. J.
+**Einordnung:** Bedingte Textausgabe ist nachgewiesen, eine gleichwertige freie Formatierung eines größeren Blocks nicht. Die Verarbeitung von IF-Feldern ist laut Bibliotheksbeschreibung experimentell. Kurzbeleg: Projekt docx-mailmerge2, o. J.
 
 ## Header, Footer und Seitenzahlen
 
-**Beobachtung:** Für diesen Branch liegt noch kein dokumentiertes Ergebnis zu
-unterschiedlich gestalteten Kopfzeilen, fortlaufenden Seitenzahlen oder einem korrekt
-gerenderten Kontaktblock im Footer vor.
+**Beobachtung:** Die Fußzeile der aktuellen Vorlage enthält die Seitenangabe. Der Kontakt- und Rechtsblock wurde nach dem gescheiterten Inklusionsversuch entfernt. Die PDFs erschienen nach Sichtprüfung wie die generierten DOCX-Dateien. Eine seitenweise dokumentierte Einzelprüfung aller Kopf- und Fußbereiche liegt nicht vor.
 
-**Einordnung:** Das Funktionieren von Word-Feldern im Dokumentkörper darf nicht
-ungeprüft auf Kopf- und Fußbereiche übertragen werden.
+**Einordnung:** Seitenangaben sind im getesteten Layout vorhanden. Unterschiedliche Logos auf erster und folgenden Seiten sowie wiederholte Tabellenköpfe sollten im abschließenden visuellen Prüfkatalog seitenweise bestätigt werden.
 
 ## Template-Inklusion
 
-**Beobachtung:** Die Einbindung einer zweiten DOCX-Datei über `INCLUDETEXT` gelang im
-lokalen Versuch nicht. Weder ein aktualisierter Kontaktblock im Ergebnisdokument noch
-dessen automatische Übernahme in die PDF wurden nachgewiesen.
+**Beobachtung:** Der lokale Versuch, eine zweite DOCX über `INCLUDETEXT` einzubinden, war nicht erfolgreich. Eine funktionierende automatische Einbindung wurde nicht nachgewiesen. Aktuell enthält die Vorlage keinen Kontakt- und Rechtsblock.
 
-**Einordnung:** Word stellt mit `INCLUDETEXT` grundsätzlich eine Feldfunktion für
-externe Inhalte bereit. Aus dieser Word-Funktion folgt jedoch keine nachgewiesene,
-robuste Teilvorlagen-Inklusion für die Kombination aus docx-mailmerge2 und
-automatisierter Konvertierung. Direkt in der Hauptvorlage angelegte MergeFields wären
-ein Workaround für den Inhalt, aber kein gleichwertiger Nachweis für
-Wiederverwendbarkeit. Kurzbeleg: Microsoft, o. J.; Projekt docx-mailmerge2, o. J.
+**Einordnung:** Der Inhalt ließe sich gegebenenfalls als einzelne Felder in der Hauptvorlage nachbauen. Dies wäre jedoch kein gleichwertiger, separat bearbeitbarer Baustein und wurde deshalb bewusst nicht als Erfüllung des Inklusionskriteriums gewertet. Das Ergebnis des lokalen Versuchs belegt keine generelle Unmöglichkeit der Word-Feldfunktion. Kurzbeleg: Microsoft, o. J.
 
 ## PDF-Konvertierung
 
-**Beobachtung:** Für den docx-mailmerge2-Branch wurde noch keine vollständige
-automatische Konvertierung und kein PDF-Ergebnis berichtet.
+**Beobachtung:** Derselbe lokal betriebene Gotenberg-Konverter wie bei docxtpl wurde verwendet. Eine isolierte DOCX-Konvertierung, der Admin-Download und der explizit aktivierte Live-Test funktionierten. Für die getesteten PDFs wurden keine wahrnehmbaren Unterschiede zur jeweiligen DOCX berichtet.
 
-**Einordnung:** Für einen fairen Vergleich soll später derselbe lokal betriebene
-Gotenberg-Dienst wie bei docxtpl verwendet und eigenständig auf diesem Branch integriert
-werden.
+**Einordnung:** Die Konvertierung war im konkreten Prototyp erfolgreich. Ohne systematische Font- und Laufzeitprüfung lassen sich daraus keine allgemeinen Aussagen zur Layouttreue oder Geschwindigkeit ableiten. Kurzbeleg: Gotenberg, o. J.
 
 ## Abweichungen von der Erwartung aus Phase 1
 
-**Beobachtung:** Die einfache dynamische Tabelle gelang. Dagegen verursachten lange
-bedingte Feldresultate Schwierigkeiten bei der visuellen Bearbeitung. Die erwartete
-Inklusion eines zweiten Word-Bausteins konnte bislang nicht demonstriert werden.
+**Beobachtung:** Die dynamische Tabelle und die bedingte Ausgabe gelangen. Der frei gestaltbare bedingte Block und die automatische Inklusion einer zweiten Word-Vorlage konnten dagegen nicht gleichwertig demonstriert werden.
 
-**Einordnung:** Das Ergebnis spricht für die Eignung bei festen Feldern und
-tabellarischen Daten. Die Vorlage stößt im getesteten Szenario bei komplexer
-Bedingungsformatierung und modularen Bausteinen an praktische Grenzen. Diese
-Einschätzung ist auf den bisherigen Prototypstand beschränkt.
+**Einordnung:** Der praktische Versuch differenziert zwischen funktionierender Datenersetzung und kundenbearbeitbarer Dokumentgestaltung.
 
 ## Vorläufiges Fazit
 
-Die funktionierende einfache DOCX-Erzeugung ist ein positiver Befund. Für die
-vorliegende Anforderung ist vor allem die fehlende nachgewiesene, automatisch
-aktualisierte Teilvorlagen-Inklusion und die beobachtete Einschränkung bei intern
-gemischter Formatierung bedingter Feldresultate relevant. Aussagen zur vollständigen
-PDF-Teilnehmerliste, zur Stabilität und zur endgültigen Eignung bleiben bis zur
-Service-Integration und zu vergleichbaren Tests offen.
+Für einfache Felder, Teilnehmerzeilen und den Admin-PDF-Download erwies sich der Ansatz als funktionsfähig. Die wesentlichen Einschränkungen liegen im getesteten Umgang mit komplex formatierten IF-Feldresultaten und in der nicht nachgewiesenen Teilvorlagen-Inklusion. Die endgültige Einordnung erfolgt erst nach dem Vergleich mit den anderen Kandidaten.
